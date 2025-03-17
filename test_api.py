@@ -11,7 +11,7 @@ import sys
 import os
 from datetime import datetime
 
-def test_api(url, participant_id="test", session_id="001", write_mode=None):
+def test_api(url, participant_id="test", session_id="001", task_name="test_task", write_mode=None):
     """Test the API by sending a sample request and printing the response."""
     
     # Create sample data with current timestamp
@@ -19,6 +19,7 @@ def test_api(url, participant_id="test", session_id="001", write_mode=None):
     test_data = {
         "id": participant_id,
         "session": session_id,
+        "task": task_name,
         "data": [
             {"time": current_time, "value": 0.5, "marker": "test_stimulus_1"},
             {"time": current_time + 100, "value": 0.7, "marker": "test_response_1"},
@@ -32,7 +33,7 @@ def test_api(url, participant_id="test", session_id="001", write_mode=None):
         test_data["write_mode"] = write_mode
     
     print(f"Sending test data to {url}...")
-    print(f"Participant ID: {participant_id}, Session ID: {session_id}")
+    print(f"Participant ID: {participant_id}, Session ID: {session_id}, Task: {task_name}")
     print(f"Write mode: {write_mode if write_mode else 'default'}")
     print(f"Number of data points: {len(test_data['data'])}")
     
@@ -79,13 +80,14 @@ def main():
     parser.add_argument("--url", default="http://localhost:5000", help="Server URL (default: http://localhost:5000)")
     parser.add_argument("--id", default="test", help="Participant ID (default: test)")
     parser.add_argument("--session", default="001", help="Session ID (default: 001)")
+    parser.add_argument("--task", default="test_task", help="Task name (default: test_task)")
     parser.add_argument("--write-mode", choices=["append", "overwrite"], 
                       help="Write mode (append or overwrite)")
     
     args = parser.parse_args()
     
     # Run the test
-    success = test_api(args.url, args.id, args.session, args.write_mode)
+    success = test_api(args.url, args.id, args.session, args.task, args.write_mode)
     
     # Exit with appropriate status code
     sys.exit(0 if success else 1)

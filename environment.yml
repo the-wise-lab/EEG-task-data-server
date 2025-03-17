@@ -12,3 +12,4 @@ dependencies:
   - pip
   - pip:
     - "sentry-sdk[flask]==1.19.1"
+    - "flask-cors==3.0.10"

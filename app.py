@@ -7,8 +7,11 @@ from logging.handlers import RotatingFileHandler
 import config
 import sentry_sdk
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+# Enable CORS for all routes
+CORS(app)
 
 # Configure logging
 data_dir, logs_dir = config.ensure_directories()
@@ -77,6 +80,9 @@ def submit_data():
         session_id = str(data["session"])
         data_points = data["data"]
         
+        # Extract optional task field
+        task_name = str(data.get("task", "unknown"))
+        
         # Get write mode - default to config value if not specified
         write_mode = data.get("write_mode", config.DEFAULT_WRITE_MODE).lower()
         
@@ -87,13 +93,18 @@ def submit_data():
 
         # Log received data
         app.logger.info(
-            f"Received data for participant {participant_id}, session {session_id} with write_mode={write_mode}"
+            f"Received data for participant {participant_id}, session {session_id}, task {task_name} with write_mode={write_mode}"
         )
 
-        # Create filename based on id and session
-        filename = (
-            f"{data_dir}/participant_{participant_id}_session_{session_id}.csv"
-        )
+        # Create task-specific directory
+        task_dir = os.path.join(data_dir, task_name)
+        os.makedirs(task_dir, exist_ok=True)
+        
+        # Create filename based on id, session, and task in the task's directory
+        filename = os.path.join(task_dir, f"participant_{participant_id}_session_{session_id}.csv")
+        
+        # Log the directory structure
+        app.logger.info(f"Using task-specific directory: {task_dir}")
 
         # Check if we have any data points
         if not data_points:
@@ -103,15 +114,16 @@ def submit_data():
                 400,
             )
 
-        # Process data points - add ID and session info to each row and format timestamps
+        # Process data points - add ID, session, and task info to each row and format timestamps
         processed_data_points = []
         for point in data_points:
             # Create a copy of the point to avoid modifying the original
             processed_point = point.copy()
             
-            # Add participant_id and session_id to each data point
+            # Add participant_id, session_id, and task_name to each data point
             processed_point["participant_id"] = participant_id
             processed_point["session_id"] = session_id
+            processed_point["task"] = task_name
             
             # Format timestamp if it exists and is numeric
             if "time" in processed_point and isinstance(processed_point["time"], (int, float)):
@@ -167,7 +179,7 @@ def submit_data():
             app.logger.info(f"Creating new file: {filename}")
 
         # Convert headers set to sorted list with specific columns first
-        priority_headers = ["participant_id", "session_id", "date", "time", "value", "marker"]
+        priority_headers = ["participant_id", "session_id", "task", "date", "time", "value", "marker"]
         
         # Ensure timestamp is not in headers
         all_keys.discard("timestamp")
@@ -192,13 +204,17 @@ def submit_data():
         else:
             action = "created"
             
-        app.logger.info(f"Successfully {action} data for participant {participant_id}, session {session_id}")
+        app.logger.info(f"Successfully {action} data for participant {participant_id}, session {session_id}, task {task_name}")
+        
+        # Use os.path.relpath to make the path relative to the data directory for cleaner output
+        rel_filename = os.path.relpath(filename, start=data_dir)
         return (
             jsonify(
                 {
                     "success": True,
-                    "message": f"Data {action} for participant {participant_id}, session {session_id}",
+                    "message": f"Data {action} for participant {participant_id}, session {session_id}, task {task_name}",
                     "filename": filename,
+                    "task_dir": task_dir,
                     "records_added": len(data_points),
                     "total_records": len(combined_data),
                     "write_mode": write_mode

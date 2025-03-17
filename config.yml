@@ -7,7 +7,7 @@ data_dir: data/
 logs_dir: logs/
 
 # Server settings
-host: 0.0.0.0
+host: 127.0.0.1
 port: 5000
 
 # Data processing options

@@ -101,6 +101,7 @@ The server will start according to the configuration settings.
 {
   "id": "123",
   "session": "1",
+  "task": "flanker",  // Optional: identifies the task type
   "write_mode": "append",  // Optional: "append" (default) or "overwrite"
   "data": [
     {"time": 1000, "value": 0.5, "marker": "stimulus_1"},
@@ -114,8 +115,8 @@ The server will start according to the configuration settings.
 ```json
 {
   "success": true,
-  "message": "Data appended to for participant 123, session 1",
-  "filename": "data/participant_123_session_1.csv",
+  "message": "Data appended to for participant 123, session 1, task flanker",
+  "filename": "data/participant_123_session_1_task_flanker.csv",
   "records_added": 2,
   "total_records": 5,
   "write_mode": "append"
@@ -124,7 +125,13 @@ The server will start according to the configuration settings.
 
 ## Data Storage
 
-- CSV files will be stored in the configured data directory with filenames in the format `participant_{id}_session_{session}.csv`.
+- CSV files will be organized by task and stored in the configured data directory with the following structure:
+  ```
+  data_dir/
+  └── task_name/
+      └── participant_{id}_session_{session}.csv
+  ```
+- Each row in the CSV file will contain participant ID, session ID, and task name.
 - You can control how data is saved to existing files using the `write_mode` parameter:
   - `append`: Adds new data to the existing file (default)
   - `overwrite`: Replaces the existing file with only the new data
