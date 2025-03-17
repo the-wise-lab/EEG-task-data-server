@@ -1,0 +1,19 @@
+# EEG Task Data Server Configuration
+
+# Data storage directory
+data_dir: data/
+
+# Logs directory
+logs_dir: logs/
+
+# Server settings
+host: 0.0.0.0
+port: 5000
+
+# Waitress server settings
+threads: 4
+
+# Error reporting (Glitchtip/Sentry)
+sentry_dsn: ""  # Add your Glitchtip DSN here
+sentry_environment: "development"  # Options: development, staging, production
+sentry_traces_sample_rate: 0.2  # Performance monitoring sample rate (0.0 to 1.0)
