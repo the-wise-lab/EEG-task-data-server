@@ -1,0 +1,14 @@
+name: eeg_task_data_server
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - flask=2.0.1
+  - werkzeug=2.0.3
+  - waitress=2.0.0
+  - pyyaml=6.0
+  - requests
+  - pip
+  - pip:
+    - "sentry-sdk[flask]==1.19.1"
