@@ -10,6 +10,9 @@ logs_dir: logs/
 host: 0.0.0.0
 port: 5000
 
+# Data processing options
+default_write_mode: "append"  # Options: "append" or "overwrite"
+
 # Waitress server settings
 threads: 4
 

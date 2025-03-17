@@ -9,6 +9,7 @@ THREADS = 4
 # Application configuration
 DATA_DIR = 'data'  # Default directory is 'data'
 LOGS_DIR = 'logs'  # Default directory is 'logs'
+DEFAULT_WRITE_MODE = 'append'  # Default write mode is append
 
 # Error reporting configuration
 SENTRY_DSN = ""  # Empty string means Sentry is disabled
@@ -33,6 +34,8 @@ if os.path.exists(yaml_config_path):
                     DATA_DIR = yaml_config['data_dir']
                 if 'logs_dir' in yaml_config:
                     LOGS_DIR = yaml_config['logs_dir']
+                if 'default_write_mode' in yaml_config:
+                    DEFAULT_WRITE_MODE = yaml_config['default_write_mode']
                 # Error reporting config
                 if 'sentry_dsn' in yaml_config:
                     SENTRY_DSN = yaml_config['sentry_dsn']
@@ -48,6 +51,8 @@ if os.environ.get('EEG_DATA_DIR'):
     DATA_DIR = os.environ.get('EEG_DATA_DIR')
 if os.environ.get('EEG_LOGS_DIR'):
     LOGS_DIR = os.environ.get('EEG_LOGS_DIR')
+if os.environ.get('EEG_DEFAULT_WRITE_MODE'):
+    DEFAULT_WRITE_MODE = os.environ.get('EEG_DEFAULT_WRITE_MODE')
 if os.environ.get('EEG_SENTRY_DSN'):
     SENTRY_DSN = os.environ.get('EEG_SENTRY_DSN')
 if os.environ.get('EEG_SENTRY_ENVIRONMENT'):

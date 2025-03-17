@@ -76,10 +76,18 @@ def submit_data():
         participant_id = str(data["id"])
         session_id = str(data["session"])
         data_points = data["data"]
+        
+        # Get write mode - default to config value if not specified
+        write_mode = data.get("write_mode", config.DEFAULT_WRITE_MODE).lower()
+        
+        # Validate write mode
+        if write_mode not in ["append", "overwrite"]:
+            write_mode = config.DEFAULT_WRITE_MODE
+            app.logger.warning(f"Invalid write_mode specified, using default: {write_mode}")
 
         # Log received data
         app.logger.info(
-            f"Received data for participant {participant_id}, session {session_id}"
+            f"Received data for participant {participant_id}, session {session_id} with write_mode={write_mode}"
         )
 
         # Create filename based on id and session
@@ -131,7 +139,7 @@ def submit_data():
         file_exists = os.path.isfile(filename)
 
         # When reading existing data, also handle any timestamp field
-        if file_exists:
+        if file_exists and write_mode == "append":
             app.logger.info(f"Appending to existing file: {filename}")
             # Read existing data and headers
             with open(filename, "r", newline="") as csvfile:
@@ -153,6 +161,10 @@ def submit_data():
                             # If we can't parse, keep it as is
                             pass
                     existing_data.append(row)
+        elif file_exists and write_mode == "overwrite":
+            app.logger.info(f"Overwriting existing file: {filename}")
+        else:
+            app.logger.info(f"Creating new file: {filename}")
 
         # Convert headers set to sorted list with specific columns first
         priority_headers = ["participant_id", "session_id", "date", "time", "value", "marker"]
@@ -163,15 +175,23 @@ def submit_data():
         remaining_headers = sorted(list(all_keys - set(priority_headers)))
         headers = [h for h in priority_headers if h in all_keys] + remaining_headers
 
-        # Write combined data to CSV file (overwrites with all data)
-        combined_data = existing_data + processed_data_points
+        # Write combined data to CSV file
+        combined_data = existing_data + processed_data_points if write_mode == "append" else processed_data_points
 
         with open(filename, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             writer.writeheader()
             writer.writerows(combined_data)
 
-        action = "appended to" if file_exists else "created"
+        # Set appropriate action message based on file existence and write mode
+        if file_exists:
+            if write_mode == "append":
+                action = "appended to"
+            else:
+                action = "overwritten"
+        else:
+            action = "created"
+            
         app.logger.info(f"Successfully {action} data for participant {participant_id}, session {session_id}")
         return (
             jsonify(
@@ -181,6 +201,7 @@ def submit_data():
                     "filename": filename,
                     "records_added": len(data_points),
                     "total_records": len(combined_data),
+                    "write_mode": write_mode
                 }
             ),
             200,

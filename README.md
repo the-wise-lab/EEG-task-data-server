@@ -44,6 +44,10 @@ The application can be configured using any of the following methods (in order o
 - **LOGS_DIR**: Directory to store log files (default: `logs/`)
   - YAML key: `logs_dir`
   - Environment variable: `EEG_LOGS_DIR`
+- **DEFAULT_WRITE_MODE**: Default behavior when writing to existing files (default: `append`)
+  - YAML key: `default_write_mode`
+  - Environment variable: `EEG_DEFAULT_WRITE_MODE`
+  - Options: `append` or `overwrite`
 - **HOST**: IP address to bind the server (default: `0.0.0.0`)
   - YAML key: `host`
 - **PORT**: Port to run the server on (default: `5000`)
@@ -97,6 +101,7 @@ The server will start according to the configuration settings.
 {
   "id": "123",
   "session": "1",
+  "write_mode": "append",  // Optional: "append" (default) or "overwrite"
   "data": [
     {"time": 1000, "value": 0.5, "marker": "stimulus_1"},
     {"time": 2000, "value": 0.7, "marker": "response_1"}
@@ -112,14 +117,17 @@ The server will start according to the configuration settings.
   "message": "Data appended to for participant 123, session 1",
   "filename": "data/participant_123_session_1.csv",
   "records_added": 2,
-  "total_records": 5
+  "total_records": 5,
+  "write_mode": "append"
 }
 ```
 
 ## Data Storage
 
 - CSV files will be stored in the configured data directory with filenames in the format `participant_{id}_session_{session}.csv`.
-- If a file already exists for the given participant ID and session ID, new data will be appended to the existing file.
+- You can control how data is saved to existing files using the `write_mode` parameter:
+  - `append`: Adds new data to the existing file (default)
+  - `overwrite`: Replaces the existing file with only the new data
 - Headers will be automatically merged if new data points have different fields.
 
 ## Error Reporting
