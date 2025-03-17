@@ -1,0 +1,59 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# Conda environments
+anaconda/
+miniconda/
+conda-bld/
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.atom/
+.eclipse/
+
+# Project specific files
+data/
+logs/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
