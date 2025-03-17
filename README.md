@@ -19,7 +19,7 @@ The application can be configured using any of the following methods (in order o
 2. YAML configuration file (`config.yml`)
 3. Python configuration file (`config.py`)
 
-### Configuration Options:
+### Configuration Options
 
 - **DATA_DIR**: Directory to store CSV files (default: `data/`)
   - YAML key: `data_dir`
@@ -42,7 +42,7 @@ The application can be configured using any of the following methods (in order o
 - **SENTRY_TRACES_SAMPLE_RATE**: Performance sampling rate (default: `0.2`)
   - YAML key: `sentry_traces_sample_rate`
 
-### Example YAML Configuration:
+### Example YAML Configuration
 
 Create a `config.yml` file in the application root directory:
 
@@ -56,22 +56,6 @@ threads: 8
 sentry_dsn: "https://your-glitchtip-key@glitchtip.example.com/2"
 sentry_environment: "production"
 sentry_traces_sample_rate: 0.1
-```
-
-### Example Environment Variables:
-
-```bash
-# Linux/Mac
-export EEG_DATA_DIR=/path/to/data/directory
-export EEG_LOGS_DIR=/path/to/logs/directory
-export EEG_SENTRY_DSN=https://your-glitchtip-key@glitchtip.example.com/2
-export EEG_SENTRY_ENVIRONMENT=production
-
-# Windows
-set EEG_DATA_DIR=C:\path\to\data\directory
-set EEG_LOGS_DIR=C:\path\to\logs\directory
-set EEG_SENTRY_DSN=https://your-glitchtip-key@glitchtip.example.com/2
-set EEG_SENTRY_ENVIRONMENT=production
 ```
 
 ## Running the Server

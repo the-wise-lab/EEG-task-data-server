@@ -14,6 +14,6 @@ port: 5000
 threads: 4
 
 # Error reporting (Glitchtip/Sentry)
-sentry_dsn: ""  # Add your Glitchtip DSN here
+sentry_dsn: "https://3ad5dd85f6504c2c8a10dd6007a95941@error-reporting.thewiselab.org/2"  # Add your Glitchtip DSN here
 sentry_environment: "development"  # Options: development, staging, production
 sentry_traces_sample_rate: 0.2  # Performance monitoring sample rate (0.0 to 1.0)
