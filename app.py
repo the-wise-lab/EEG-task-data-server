@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import config
 import sentry_sdk
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -27,6 +28,22 @@ app.logger.setLevel(logging.INFO)
 
 app.logger.info(f"Using data directory: {data_dir}")
 app.logger.info(f"Using logs directory: {logs_dir}")
+
+
+def format_timestamp(epoch_ms):
+    """Convert epoch milliseconds to a readable timestamp string and separate date/time."""
+    try:
+        # Convert milliseconds to seconds
+        epoch_seconds = epoch_ms / 1000.0
+        # Convert to datetime
+        dt = datetime.fromtimestamp(epoch_seconds)
+        # Format date and time separately
+        date_str = dt.strftime("%Y-%m-%d")
+        time_str = dt.strftime("%H:%M:%S.%f")[:-3]  # Trim to milliseconds
+        return date_str, time_str
+    except (ValueError, TypeError):
+        # Return placeholders if conversion fails
+        return str(epoch_ms), ""
 
 
 @app.route("/submit_data", methods=["POST"])
@@ -78,15 +95,42 @@ def submit_data():
                 400,
             )
 
-        # Get all unique keys from all data points for new data
-        all_keys = set()
+        # Process data points - add ID and session info to each row and format timestamps
+        processed_data_points = []
         for point in data_points:
+            # Create a copy of the point to avoid modifying the original
+            processed_point = point.copy()
+            
+            # Add participant_id and session_id to each data point
+            processed_point["participant_id"] = participant_id
+            processed_point["session_id"] = session_id
+            
+            # Format timestamp if it exists and is numeric
+            if "time" in processed_point and isinstance(processed_point["time"], (int, float)):
+                # Store the original time value temporarily
+                original_time = processed_point["time"]
+                
+                # Create separate date and time fields
+                date_str, time_str = format_timestamp(original_time)
+                processed_point["date"] = date_str
+                processed_point["time"] = time_str
+                
+                # Remove any timestamp field that might exist
+                if "timestamp" in processed_point:
+                    del processed_point["timestamp"]
+            
+            processed_data_points.append(processed_point)
+
+        # Get all unique keys from all processed data points
+        all_keys = set()
+        for point in processed_data_points:
             all_keys.update(point.keys())
 
         # Check if file already exists
         existing_data = []
         file_exists = os.path.isfile(filename)
 
+        # When reading existing data, also handle any timestamp field
         if file_exists:
             app.logger.info(f"Appending to existing file: {filename}")
             # Read existing data and headers
@@ -95,15 +139,32 @@ def submit_data():
                 # Update headers with any columns in the existing file
                 if reader.fieldnames:
                     all_keys.update(reader.fieldnames)
-                # Store existing data
+                # Store existing data with possible transformation
                 for row in reader:
+                    # Convert any timestamp field to date/time if it exists
+                    if "timestamp" in row and "date" not in row and "time" not in row:
+                        try:
+                            # Try to parse the timestamp
+                            dt = datetime.strptime(row["timestamp"], "%Y-%m-%d %H:%M:%S.%f")
+                            row["date"] = dt.strftime("%Y-%m-%d")
+                            row["time"] = dt.strftime("%H:%M:%S.%f")[:-3]
+                            del row["timestamp"]
+                        except (ValueError, TypeError):
+                            # If we can't parse, keep it as is
+                            pass
                     existing_data.append(row)
 
-        # Convert headers set to sorted list
-        headers = sorted(list(all_keys))
+        # Convert headers set to sorted list with specific columns first
+        priority_headers = ["participant_id", "session_id", "date", "time", "value", "marker"]
+        
+        # Ensure timestamp is not in headers
+        all_keys.discard("timestamp")
+        
+        remaining_headers = sorted(list(all_keys - set(priority_headers)))
+        headers = [h for h in priority_headers if h in all_keys] + remaining_headers
 
         # Write combined data to CSV file (overwrites with all data)
-        combined_data = existing_data + data_points
+        combined_data = existing_data + processed_data_points
 
         with open(filename, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)

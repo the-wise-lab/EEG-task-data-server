@@ -4,12 +4,42 @@ A Flask application that receives JSON data via POST requests and stores it in C
 
 ## Installation
 
+### Using Python Virtual Environment
+
 1. Clone the repository
 2. Create a virtual environment: `python -m venv venv`
 3. Activate the virtual environment:
    - Windows: `venv\Scripts\activate`
    - Unix/Mac: `source venv/bin/activate`
 4. Install dependencies: `pip install -r requirements.txt`
+
+### Using Conda Environment
+
+1. Clone the repository
+2. Create a conda environment:
+
+   ```bash
+   conda create -n eeg_task_data_server python=3.11
+   ```
+
+3. Activate the conda environment:
+
+   ```bash
+   conda activate eeg_task_data_server
+   ```
+
+4. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   Or alternatively:
+
+   ```bash
+   conda install -c conda-forge flask waitress pyyaml
+   pip install sentry-sdk[flask]
+   ```
 
 ## Configuration
 
