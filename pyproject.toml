@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "local-data-storage"
+version = "0.1.0"
+description = "Local data storage server for EEG task data"
+requires-python = ">=3.8"
+dependencies = [
+    "flask==2.0.1",
+    "werkzeug==2.0.3",
+    "waitress==2.0.0",
+    "pyyaml==6.0",
+    "sentry-sdk[flask]==1.19.1",
+    "requests",
+    "flask-cors==3.0.10",
+]
+
+[project.scripts]
+local-data-storage = "local_data_storage:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["local_data_storage"]

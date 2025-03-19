@@ -1,47 +1,45 @@
 # EEG Task Data Server
-
 A Flask application that receives JSON data via POST requests and stores it in CSV files.
 
 ## Installation
 
-### Using Python Virtual Environment
+### Using pip
+```bash
+pip install .
+```
 
-1. Clone the repository
-2. Create a virtual environment: `python -m venv venv`
-3. Activate the virtual environment:
-   - Windows: `venv\Scripts\activate`
-   - Unix/Mac: `source venv/bin/activate`
-4. Install dependencies: `pip install -r requirements.txt`
+## Usage
 
-### Using Conda Environment
+After installation, you can run the server using the command-line interface:
 
-1. Clone the repository
-2. Create and activate the conda environment using the environment file:
+```bash
+local-data-storage [options]
+```
 
-   ```bash
-   conda env create -f environment.yml && conda activate eeg_task_data_server
-   ```
+### Command Line Options
+- `--data-dir PATH`: Directory for storing data files (overrides config)
+- `--logs-dir PATH`: Directory for storing log files (overrides config)
+- `--host HOST`: Host to bind to (default: 0.0.0.0)
+- `--port PORT`: Port to listen on (default: 5000)
 
-3. Ready to use! Run the server with:
-
-   ```bash
-   python server.py
-   ```
+Example:
+```bash
+local-data-storage --data-dir /path/to/data --logs-dir /path/to/logs --port 8080
+```
 
 ## Configuration
-
 The application can be configured using any of the following methods (in order of precedence):
-
-1. Environment variables
-2. YAML configuration file (`config.yml`)
-3. Python configuration file (`config.py`)
+1. Command line arguments
+2. Environment variables
+3. YAML configuration file (`config.yml`)
 
 ### Configuration Options
-
 - **DATA_DIR**: Directory to store CSV files (default: `data/`)
+  - Command line: `--data-dir`
   - YAML key: `data_dir`
   - Environment variable: `EEG_DATA_DIR`
 - **LOGS_DIR**: Directory to store log files (default: `logs/`)
+  - Command line: `--logs-dir`
   - YAML key: `logs_dir`
   - Environment variable: `EEG_LOGS_DIR`
 - **DEFAULT_WRITE_MODE**: Default behavior when writing to existing files (default: `append`)
@@ -49,8 +47,10 @@ The application can be configured using any of the following methods (in order o
   - Environment variable: `EEG_DEFAULT_WRITE_MODE`
   - Options: `append` or `overwrite`
 - **HOST**: IP address to bind the server (default: `0.0.0.0`)
+  - Command line: `--host`
   - YAML key: `host`
 - **PORT**: Port to run the server on (default: `5000`)
+  - Command line: `--port`
   - YAML key: `port`
 - **THREADS**: Number of worker threads for Waitress (default: `4`)
   - YAML key: `threads`
@@ -64,9 +64,7 @@ The application can be configured using any of the following methods (in order o
   - YAML key: `sentry_traces_sample_rate`
 
 ### Example YAML Configuration
-
 Create a `config.yml` file in the application root directory:
-
 ```yaml
 # EEG Task Data Server Configuration
 data_dir: /path/to/data/
@@ -79,24 +77,11 @@ sentry_environment: "production"
 sentry_traces_sample_rate: 0.1
 ```
 
-## Running the Server
-
-To run the server with waitress:
-
-```bash
-python server.py
-```
-
-The server will start according to the configuration settings.
-
 ## API Usage
-
 ### Submit Data
-
 **Endpoint:** `POST /submit_data`
 
 **Request Format:**
-
 ```json
 {
   "id": "123",
@@ -111,7 +96,6 @@ The server will start according to the configuration settings.
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -124,7 +108,6 @@ The server will start according to the configuration settings.
 ```
 
 ## Data Storage
-
 - CSV files will be organized by task and stored in the configured data directory with the following structure:
   ```
   data_dir/
@@ -138,9 +121,7 @@ The server will start according to the configuration settings.
 - Headers will be automatically merged if new data points have different fields.
 
 ## Error Reporting
-
 The application uses Glitchtip (Sentry-compatible) for error reporting. To enable it:
-
 1. Set up a Glitchtip account and create a project
 2. Copy the DSN from your Glitchtip project settings
 3. Add the DSN to your config.yml file or set it as an environment variable
