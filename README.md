@@ -1,12 +1,36 @@
 # EEG Task Data Server
+
 A Flask application that receives JSON data via POST requests and stores it in CSV files.
 
 ## Installation
 
-### Using pip
-```bash
-pip install .
-```
+### Using Python Virtual Environment
+
+1. Clone the repository
+2. Create a virtual environment:
+
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - Windows:
+
+     ```bash
+     venv\Scripts\activate
+     ```
+
+   - Unix/Mac:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install the package in development mode:
+
+   ```bash
+   pip install -e .
+   ```
 
 ## Usage
 
@@ -17,23 +41,28 @@ local-data-storage [options]
 ```
 
 ### Command Line Options
+
 - `--data-dir PATH`: Directory for storing data files (overrides config)
 - `--logs-dir PATH`: Directory for storing log files (overrides config)
 - `--host HOST`: Host to bind to (default: 0.0.0.0)
 - `--port PORT`: Port to listen on (default: 5000)
 
 Example:
+
 ```bash
 local-data-storage --data-dir /path/to/data --logs-dir /path/to/logs --port 8080
 ```
 
 ## Configuration
+
 The application can be configured using any of the following methods (in order of precedence):
+
 1. Command line arguments
 2. Environment variables
 3. YAML configuration file (`config.yml`)
 
 ### Configuration Options
+
 - **DATA_DIR**: Directory to store CSV files (default: `data/`)
   - Command line: `--data-dir`
   - YAML key: `data_dir`
@@ -64,7 +93,9 @@ The application can be configured using any of the following methods (in order o
   - YAML key: `sentry_traces_sample_rate`
 
 ### Example YAML Configuration
+
 Create a `config.yml` file in the application root directory:
+
 ```yaml
 # EEG Task Data Server Configuration
 data_dir: /path/to/data/
@@ -78,10 +109,13 @@ sentry_traces_sample_rate: 0.1
 ```
 
 ## API Usage
+
 ### Submit Data
+
 **Endpoint:** `POST /submit_data`
 
 **Request Format:**
+
 ```json
 {
   "id": "123",
@@ -96,6 +130,7 @@ sentry_traces_sample_rate: 0.1
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -108,12 +143,15 @@ sentry_traces_sample_rate: 0.1
 ```
 
 ## Data Storage
+
 - CSV files will be organized by task and stored in the configured data directory with the following structure:
+
   ```
   data_dir/
   └── task_name/
       └── participant_{id}_session_{session}.csv
   ```
+
 - Each row in the CSV file will contain participant ID, session ID, and task name.
 - You can control how data is saved to existing files using the `write_mode` parameter:
   - `append`: Adds new data to the existing file (default)
@@ -121,7 +159,9 @@ sentry_traces_sample_rate: 0.1
 - Headers will be automatically merged if new data points have different fields.
 
 ## Error Reporting
+
 The application uses Glitchtip (Sentry-compatible) for error reporting. To enable it:
+
 1. Set up a Glitchtip account and create a project
 2. Copy the DSN from your Glitchtip project settings
 3. Add the DSN to your config.yml file or set it as an environment variable
