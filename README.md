@@ -6,7 +6,7 @@ A Flask application that receives JSON data via POST requests and stores it in C
 
 ### Using Python Virtual Environment
 
-1. Clone the repository
+1. Clone or download the repository
 2. Create a virtual environment:
 
    ```bash
@@ -94,19 +94,7 @@ The application can be configured using any of the following methods (in order o
 
 ### Example YAML Configuration
 
-Create a `config.yml` file in the application root directory:
-
-```yaml
-# EEG Task Data Server Configuration
-data_dir: /path/to/data/
-logs_dir: /path/to/logs/
-host: 127.0.0.1
-port: 8080
-threads: 8
-sentry_dsn: "https://your-glitchtip-key@glitchtip.example.com/2"
-sentry_environment: "production"
-sentry_traces_sample_rate: 0.1
-```
+See the `config.yml` file in the repository for an example configuration. You can modify it to suit your needs.
 
 ## API Usage
 
@@ -146,7 +134,7 @@ sentry_traces_sample_rate: 0.1
 
 - CSV files will be organized by task and stored in the configured data directory with the following structure:
 
-  ```
+  ```bash
   data_dir/
   └── task_name/
       └── participant_{id}_session_{session}.csv
