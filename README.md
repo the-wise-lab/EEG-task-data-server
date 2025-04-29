@@ -6,42 +6,117 @@ A Flask application that receives JSON data via POST requests and stores it in C
 
 ### Using Python Virtual Environment
 
-1. Clone the repository
-2. Create a virtual environment: `python -m venv venv`
+1. Clone or download the repository
+2. Create a virtual environment:
+
+   ```bash
+   python -m venv venv
+   ```
+
 3. Activate the virtual environment:
-   - Windows: `venv\Scripts\activate`
-   - Unix/Mac: `source venv/bin/activate`
-4. Install dependencies: `pip install -r requirements.txt`
+   - Windows:
 
-### Using Conda Environment
+     ```bash
+     venv\Scripts\activate
+     ```
+
+   - Unix/Mac:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install the package in development mode:
+
+   ```bash
+   pip install -e .
+   ```
+
+### Using Docker
+
+The application can be easily deployed using Docker, which ensures consistent behavior across different environments.
+
+#### Prerequisites
+
+- Docker and Docker Compose installed on your system
+
+#### Building and Running with Docker Compose
 
 1. Clone the repository
-2. Create and activate the conda environment using the environment file:
+2. Build and start the container:
 
    ```bash
-   conda env create -f environment.yml && conda activate eeg_task_data_server
+   docker-compose up -d
    ```
 
-3. Ready to use! Run the server with:
+3. The server will be available at <http://localhost:5000>
+
+#### Customizing the Docker Deployment
+
+You can customize the Docker deployment by:
+
+1. Modifying the `config.yml` file before building
+2. Setting environment variables in the `docker-compose.yml` file
+3. Mounting different volumes for data and logs
+
+#### Building the Docker Image Manually
+
+If you prefer to manage the container without Docker Compose:
+
+1. Build the image:
 
    ```bash
-   python server.py
+   docker build -t eeg-task-data-server .
    ```
+
+2. Run the container:
+
+   ```bash
+   docker run -d -p 5000:5000 \
+     -v $(pwd)/data:/app/data \
+     -v $(pwd)/logs:/app/logs \
+     -v $(pwd)/config.yml:/app/config.yml \
+     --name eeg-task-data-server \
+     eeg-task-data-server
+   ```
+
+## Usage
+
+After installation, you can run the server using the command-line interface:
+
+```bash
+local-data-storage [options]
+```
+
+### Command Line Options
+
+- `--data-dir PATH`: Directory for storing data files (overrides config)
+- `--logs-dir PATH`: Directory for storing log files (overrides config)
+- `--host HOST`: Host to bind to (default: 0.0.0.0)
+- `--port PORT`: Port to listen on (default: 5000)
+
+Example:
+
+```bash
+local-data-storage --data-dir /path/to/data --logs-dir /path/to/logs --port 8080
+```
 
 ## Configuration
 
 The application can be configured using any of the following methods (in order of precedence):
 
-1. Environment variables
-2. YAML configuration file (`config.yml`)
-3. Python configuration file (`config.py`)
+1. Command line arguments
+2. Environment variables
+3. YAML configuration file (`config.yml`)
 
 ### Configuration Options
 
 - **DATA_DIR**: Directory to store CSV files (default: `data/`)
+  - Command line: `--data-dir`
   - YAML key: `data_dir`
   - Environment variable: `EEG_DATA_DIR`
 - **LOGS_DIR**: Directory to store log files (default: `logs/`)
+  - Command line: `--logs-dir`
   - YAML key: `logs_dir`
   - Environment variable: `EEG_LOGS_DIR`
 - **DEFAULT_WRITE_MODE**: Default behavior when writing to existing files (default: `append`)
@@ -49,8 +124,10 @@ The application can be configured using any of the following methods (in order o
   - Environment variable: `EEG_DEFAULT_WRITE_MODE`
   - Options: `append` or `overwrite`
 - **HOST**: IP address to bind the server (default: `0.0.0.0`)
+  - Command line: `--host`
   - YAML key: `host`
 - **PORT**: Port to run the server on (default: `5000`)
+  - Command line: `--port`
   - YAML key: `port`
 - **THREADS**: Number of worker threads for Waitress (default: `4`)
   - YAML key: `threads`
@@ -65,29 +142,7 @@ The application can be configured using any of the following methods (in order o
 
 ### Example YAML Configuration
 
-Create a `config.yml` file in the application root directory:
-
-```yaml
-# EEG Task Data Server Configuration
-data_dir: /path/to/data/
-logs_dir: /path/to/logs/
-host: 127.0.0.1
-port: 8080
-threads: 8
-sentry_dsn: "https://your-glitchtip-key@glitchtip.example.com/2"
-sentry_environment: "production"
-sentry_traces_sample_rate: 0.1
-```
-
-## Running the Server
-
-To run the server with waitress:
-
-```bash
-python server.py
-```
-
-The server will start according to the configuration settings.
+See the `config.yml` file in the repository for an example configuration. You can modify it to suit your needs.
 
 ## API Usage
 
@@ -126,11 +181,13 @@ The server will start according to the configuration settings.
 ## Data Storage
 
 - CSV files will be organized by task and stored in the configured data directory with the following structure:
-  ```
+
+  ```bash
   data_dir/
   └── task_name/
       └── participant_{id}_session_{session}.csv
   ```
+
 - Each row in the CSV file will contain participant ID, session ID, and task name.
 - You can control how data is saved to existing files using the `write_mode` parameter:
   - `append`: Adds new data to the existing file (default)
