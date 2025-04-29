@@ -32,6 +32,54 @@ A Flask application that receives JSON data via POST requests and stores it in C
    pip install -e .
    ```
 
+### Using Docker
+
+The application can be easily deployed using Docker, which ensures consistent behavior across different environments.
+
+#### Prerequisites
+
+- Docker and Docker Compose installed on your system
+
+#### Building and Running with Docker Compose
+
+1. Clone the repository
+2. Build and start the container:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+3. The server will be available at <http://localhost:5000>
+
+#### Customizing the Docker Deployment
+
+You can customize the Docker deployment by:
+
+1. Modifying the `config.yml` file before building
+2. Setting environment variables in the `docker-compose.yml` file
+3. Mounting different volumes for data and logs
+
+#### Building the Docker Image Manually
+
+If you prefer to manage the container without Docker Compose:
+
+1. Build the image:
+
+   ```bash
+   docker build -t eeg-task-data-server .
+   ```
+
+2. Run the container:
+
+   ```bash
+   docker run -d -p 5000:5000 \
+     -v $(pwd)/data:/app/data \
+     -v $(pwd)/logs:/app/logs \
+     -v $(pwd)/config.yml:/app/config.yml \
+     --name eeg-task-data-server \
+     eeg-task-data-server
+   ```
+
 ## Usage
 
 After installation, you can run the server using the command-line interface:
