@@ -7,8 +7,8 @@ HOST = '0.0.0.0'
 PORT = 5000
 THREADS = 4
 DEFAULT_WRITE_MODE = 'append'
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
-LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs')
+DATA_DIR = os.path.abspath(os.path.join(os.getcwd(), 'data'))
+LOGS_DIR = os.path.abspath(os.path.join(os.getcwd(), 'logs'))
 
 # Sentry configuration
 SENTRY_DSN = None
